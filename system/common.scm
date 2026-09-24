@@ -8,35 +8,11 @@
 			   #:use-module (gnu packages bash)
 			   #:use-module (gnu services desktop)
 			   #:use-module (gnu services guix)
-			   #:export (common-packages common-services common-system)) ;; Common system definitions.
+			   #:export (common-system)) ;; Common system definitions.
 (use-service-modules networking ssh authentication desktop dbus)
 (use-package-modules certs shells)
 
-(define common-packages
-  (append (map specification->package+output
-			   '("bash"
-				 "git"
-				 "openssl"
-				 "polkit"
-			     "dbus"
-			     "cryptsetup"
-	    	     "libusb"
-	    		 "dosfstools"
-				 "ncurses"
-				 "network-manager"
-				 "wpa-supplicant"))
-		  %base-packages))
-(define (common-services user-home)
-  (append (list
-			(service accountsservice-service-type)
-			(service elogind-service-type)
-	  		(service wpa-supplicant-service-type)
-	  		(service network-manager-service-type)
-			(service guix-home-service-type
-					 `(("user" ,user-home))))
-		  %base-services))
-
-(define (common-system user-home)
+(define common-system
   (operating-system
 	(locale "en_GB.utf8")
 	(timezone "Europe/London")
@@ -59,8 +35,25 @@
 						   (supplementary-groups
 							 '("wheel" "users" "audio" "cdrom"))))
 		   %base-user-accounts))
-	(packages common-packages)
-	(services (common-services user-home))
+	(packages (append (map specification->package+output
+						   '("bash"
+							 "git"
+							 "openssl"
+							 "polkit"
+							 "dbus"
+							 "cryptsetup"
+							 "libusb"
+	    					 "dosfstools"
+							 "ncurses"
+							 "network-manager"
+							 "wpa-supplicant"))
+					  %base-packages))
+	(services (append (list
+						(service accountsservice-service-type)
+						(service elogind-service-type)
+	  					(service wpa-supplicant-service-type)
+	  					(service network-manager-service-type)
+					  %base-services))
 	(swap-devices (list
 					(swap-space
 					  (target "/swap-file")

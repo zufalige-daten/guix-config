@@ -1,7 +1,4 @@
-(add-to-load-path "/config")
+(load "system/common.scm")
+(load "system/desktop.scm")
 
-(use-modules ((sysconf desktop)
-					  #:select (desktop-system)))
-
-desktop-system
-
+(desktop-system-transformation common-system)

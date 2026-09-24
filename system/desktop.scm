@@ -1,25 +1,23 @@
 (define-module (sysconf desktop)
-			   #:use-module ((sysconf common)
-							 #:select (common-packages common-services common-system))
+			   #:use-module ((userconf common)
+							 #:select (user-common-home))
 			   #:use-module ((userconf desktop)
-							 #:select (user-desktop-home))
+							 #:select (user-desktop-home-transformation))
 			   #:use-module (gnu)
 			   #:use-module (guix utils)
 			   #:use-module (gnu packages)
 			   #:use-module (guix packages)
-			   #:export (desktop-system)) ;; Special configuration for desktop.
+			   #:export (desktop-system-transformation)) ;; Special configuration for desktop.
 
-(define desktop-system
+(define (desktop-system-transformation os)
   (operating-system
-	(inherit (common-system user-desktop-home))
+	(inherit os)
 	(host-name "null0")
 	(keyboard-layout (keyboard-layout "gb"))
-	(packages (append
-				'()
-				common-packages))
 	(services (append
-				'()
-				(common-services user-desktop-home)))
+				(operating-system-services os)
+				(service guix-home-service-type
+					 `(("user" ,(user-desktop-home-transformation user-common-home))))))
 	(bootloader (bootloader-configuration
                   (bootloader grub-bootloader)
                   (targets '("/dev/sda"))
